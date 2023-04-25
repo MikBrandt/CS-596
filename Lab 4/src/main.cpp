@@ -22,9 +22,11 @@ unsigned int prevSteps_TMP = 0;
 LSM6DSO myIMU;
 bool stepping = false;
 
+// callback function for when data is sent from phone
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
         std::string value = pCharacteristic->getValue().c_str();
+        // turn light on or off depending on input
         if (value == "On" || value == "on"){digitalWrite(LEDPIN, HIGH);}
         else if (value == "Off" || value == "off"){digitalWrite(LEDPIN, LOW);}
     }
@@ -77,6 +79,7 @@ void setup()
 }
 
 void calibrate(){
+  // sets a threshold for rootMeanSquare to count as a step
   Serial.println("Calibrating...");
   while (millis() - start_callibration_time < CALLIBRATIONMS){
     rootMeanSquare = float(sqrt(pow(myIMU.readFloatGyroX(), 2) + 
@@ -91,10 +94,12 @@ void calibrate(){
 
 void loop()
 {
+  // calibrate for the first 5 seconds
   if (!calibrated){
     start_callibration_time = millis();
     calibrate();
   }
+  // then, check for steps
   rootMeanSquare = float(sqrt(pow(myIMU.readFloatGyroX(), 2) + 
                           pow(myIMU.readFloatGyroY(), 2)+
                           pow(myIMU.readFloatGyroX(), 2)));
@@ -102,11 +107,13 @@ void loop()
       if (!stepping){
         steps++;
         stepping = true;
+        // assume 2 steps can't happen in the same 0.5 seconds
         delay(500);
       }
   }
   else{stepping = false;}
 
+  // if a new step was detected, print to console and to phone
   if (prevSteps_TMP < steps){
     Serial.print(steps);
     Serial.println(" steps");
