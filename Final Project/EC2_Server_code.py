@@ -11,8 +11,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-        access_key = 'AKIAQHJN7BRKATNLSBWT'
-        secret_key = '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'
+        access_key = 'my_access_key'
+        secret_key = 'my_secret_key'
         region = 'us-west-2'
         bucket_name = 'cs596project'
         object_key = 'test_image.jpg' #should be provided by pi
@@ -21,7 +21,7 @@ def hello():
         s3_object = s3.Object(bucket_name, object_key)
         s3_object_body = s3_object.get()['Body'].read()
         email = 'noreplycs596project@gmail.com'
-        password = 'vvrjwygvwewhavgz'
+        password = 'my_pass'
         phone_number = '6508924454' #should be provided by pi
         carrier_gateway = 'txt.att.net' #should be provided by pi
         message = 'Motion Detected!'
